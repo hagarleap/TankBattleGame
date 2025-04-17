@@ -7,11 +7,15 @@ void Shell::advance() {
     if (!active) return;
 
     // Move by ±2 units in x/y depending on direction
-    // Dummy implementation — you’ll replace this with real logic
     switch (direction) {
-        case Direction::R: position.x += 2; break;
-        case Direction::L: position.x -= 2; break;
-        // Add other directions...
+        case Direction::R: position.x += 1; break;
+        case Direction::L: position.x -= 1; break;
+        case Direction::U: position.y += 1; break;
+        case Direction::D: position.y -= 1; break;
+        case Direction::UL: position.x -= 1; position.y += 1; break;
+        case Direction::UR: position.x += 1; position.y +=1; break;
+        case Direction::DL: position.x -= 1; position.y -= 1; break;
+        case Direction:: DR: position.x += 1; position.y -= 1; break;
         default: break;
     }
 }

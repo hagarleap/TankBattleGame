@@ -20,24 +20,52 @@ Direction Tank::getDirection() const {
     return direction;
 }
 
-void Tank::setPosition(Position newPos) {
-    position = newPos;
+void Tank::moveForward() {
+    previousPosition = position;
+    position = position.move(direction, 1); // move 1 step in current direction
+}
+
+void Tank::moveBackward() {
+    previousPosition = position;
+    position = position.move(opposite(direction), 1); // move 1 step backward
+}
+
+void Tank::rotateRight8() {
+    rotateR8(direction); // turn 1/8 right
+}
+
+void Tank::rotateLeft8() {
+    rotateL8(direction); // turn 1/8 left
+}
+
+void Tank::rotateRight4() {
+    rotateR4(direction); // turn 1/4 right (2 steps)
+}
+
+void Tank::rotateLeft4() {
+    rotateL4(direction); // turn 1/4 left (2 steps)
+}
+
+void Tank::cancelMove() {
+    position = previousPosition;
 }
 
 void Tank::setDirection(Direction newDir) {
     direction = newDir;
 }
 
-void Tank::queueAction(Action action) {
-    actionQueue.push(action);
-}
+// void Tank::queueAction(TankAction action) {
+//     actionQueue.push(action);
+// }
 
-Action Tank::nextAction() {
-    if (actionQueue.empty()) return Action::None;
-    Action action = actionQueue.front();
-    actionQueue.pop();
-    return action;
-}
+
+
+// TankAction Tank::nextAction() {
+//     if (actionQueue.empty()) return TankAction::None;
+//     TankAction action = actionQueue.front();
+//     actionQueue.pop();
+//     return action;
+// }
 
 bool Tank::canShoot() const {
     return shootCooldown == 0 && shellsLeft > 0;
@@ -57,6 +85,15 @@ void Tank::tickCooldown() {
 int Tank::getShellsLeft() const {
     return shellsLeft;
 }
+
+bool Tank::isAlive() const {
+    return !destroyed;
+}
+
+void Tank::destroy() {
+    destroyed = true;
+}
+
 
 std::string Tank::toString() const {
     std::ostringstream oss;

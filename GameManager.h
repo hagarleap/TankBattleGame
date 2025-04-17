@@ -4,7 +4,7 @@
 #include "Board.h"
 #include "Tank.h"
 #include "Shell.h"
-#include "Action.h"
+#include "TankAction.h"
 #include <vector>
 #include <string>
 #include <fstream>
@@ -32,10 +32,11 @@ private:
     std::string resultMessage;
 
     void tick();
-    void handleTankAction(Tank& tank, Action action);
-    void updateShells();
+    void handleTankAction(Tank& tank, TankAction action);
+    void moveShells();
     void checkCollisions();
-    void recordAction(int playerId, int tankId, Action action, bool success);
+    void updateBoard();
+    void recordAction(int playerId, int tankId, TankAction action, bool success);
 };
 
 #endif // GAMEMANAGER_H

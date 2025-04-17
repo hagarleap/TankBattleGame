@@ -4,6 +4,7 @@
 #include "Tile.h"
 #include <vector>
 #include <string>
+#include "Position.h"
 
 class Board {
 public:
@@ -15,6 +16,7 @@ public:
     int getHeight() const;
     
     Tile& getTile(int x, int y);
+    Tile& getTile(Position pos);
     const Tile& getTile(int x, int y) const;
 
     void print() const;
