@@ -5,6 +5,7 @@
 #include "Tank.h"
 #include "Shell.h"
 #include "TankAction.h"
+#include "StrategyManager.h"
 #include <vector>
 #include <string>
 #include <fstream>
@@ -12,8 +13,11 @@
 class GameManager {
 public:
     GameManager(Board& board,
-                 std::vector<Tank>& player1Tanks,
-                 std::vector<Tank>& player2Tanks);
+                std::shared_ptr<StrategyManager> smP1,
+                std::shared_ptr<StrategyManager> smP2,
+                std::vector<Tank>& player1Tanks,
+                std::vector<Tank>& player2Tanks
+                );
 
     void run(int maxSteps = 1000);
     void writeLog(const std::string& outputFile) const;
@@ -23,6 +27,8 @@ public:
 private:
     Board& board;
 
+    std::shared_ptr<StrategyManager> strategyP1;
+    std::shared_ptr<StrategyManager> strategyP2;
     std::vector<Tank>& player1Tanks;
     std::vector<Tank>& player2Tanks;
     std::vector<Shell> shells;

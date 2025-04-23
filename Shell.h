@@ -11,6 +11,7 @@ public:
 
     void advance(Board& board);  // moves 2 squares per step
     Position getPosition() const;
+    Direction getDirection() const;
     bool isActive() const;
     
 

@@ -22,6 +22,7 @@ public:
     Tile& getTile(int x, int y);
     Tile& getTile(Position pos);
     const Tile& getTile(int x, int y) const;
+    const Tile& getTile(Position pos) const;
 
     void print() const;
 

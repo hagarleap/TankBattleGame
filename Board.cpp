@@ -84,6 +84,10 @@ const Tile& Board::getTile(int x, int y) const {
     return tiles[y][x];
 }
 
+const Tile& Board::getTile(Position pos) const {
+    return tiles[pos.y][pos.x];
+}
+
 
 void Board::print() const {
     for (const auto& row : tiles) {

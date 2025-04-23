@@ -1,6 +1,12 @@
 #include "ChasingAlgorithm.h"
+#include "Board.h"
+#include "Tile.h"
+#include "Direction.h"
 #include <queue>
 #include <unordered_map>
+#include <cmath>
+#include <climits>
+// This implementation uses 2-step BFS to chase the opponent while treating walls and mines as obstacles.
 
 TankAction ChasingAlgorithm::decideAction(const Tank& tank, const Board& board, const std::vector<Shell>& shells) {
     Position start = tank.getPosition();
@@ -8,12 +14,12 @@ TankAction ChasingAlgorithm::decideAction(const Tank& tank, const Board& board, 
     int width = board.getWidth();
     int height = board.getHeight();
 
-    // Find opponent tank
-    Position target = {-1, -1};
+    // Find enemy tank position
+    Position target{-1, -1};
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
-            Tile tile = board.getTile(x, y);
-            if ((tank.getPlayerId() == 1 && tile.isTank2()) || (tank.getPlayerId() == 2 && tile.isTank1())) {
+            Tile t = board.getTile(x, y);
+            if ((tank.getPlayerId() == 1 && t.isTank2()) || (tank.getPlayerId() == 2 && t.isTank1())) {
                 target = {x, y};
                 break;
             }
@@ -21,52 +27,46 @@ TankAction ChasingAlgorithm::decideAction(const Tank& tank, const Board& board, 
     }
     if (target.x == -1) return TankAction::None;
 
-    // BFS for shortest direction
-    std::queue<Position> q;
-    std::unordered_map<int, Position> parent;
+    // 2-step BFS (lookahead)
+    struct Node { Position pos; Direction firstStep; int depth; };
+    std::queue<Node> q;
     std::unordered_map<int, bool> visited;
     auto hash = [&](Position p) { return p.y * width + p.x; };
 
-    q.push(start);
-    visited[hash(start)] = true;
-
-    const std::vector<Direction> directions = {Direction::U, Direction::UR, Direction::R, Direction::DR, Direction::D, Direction::DL, Direction::L, Direction::UL};
-
-    while (!q.empty()) {
-        Position current = q.front(); q.pop();
-        if (current == target) break;
-
-        for (Direction d : directions) {
-            Position next = current.move(d);
-            if (next.x < 0 || next.y < 0 || next.x >= width || next.y >= height) continue;
-            Tile t = board.getTile(next);
-            if (t.isWall() || t.isOccupied()) continue;
-            int h = hash(next);
-            if (visited[h]) continue;
-            visited[h] = true;
-            parent[h] = current;
-            q.push(next);
-        }
-    }
-
-    if (!visited[hash(target)]) return TankAction::None;
-
-    // Trace one step toward target
-    Position p = target;
-    while (parent[hash(p)] != start) {
-        p = parent[hash(p)];
-    }
-
-    // Decide how to move toward p
-    int dx = p.x - start.x;
-    int dy = p.y - start.y;
+    const std::vector<Direction> directions = {Direction::U, Direction::UR, Direction::R, Direction::DR,
+                                               Direction::D, Direction::DL, Direction::L, Direction::UL};
 
     for (Direction d : directions) {
-        if (::dx(d) == dx && ::dy(d) == dy) {
-            if (d == dir) return TankAction::MoveForward;
-            // Rotation logic (simplified)
-            return TankAction::RotateRight8;
+        Position next = start.move(d);
+        if (next.x < 0 || next.x >= width || next.y < 0 || next.y >= height) continue;
+        const Tile& t = board.getTile(next);
+        if (t.isWall() || t.isMine() || t.isOccupied()) continue;
+        q.push({next, d, 1});
+        visited[hash(next)] = true;
+    }
+
+    Direction bestDir = dir;
+    int bestDist = INT_MAX;
+
+    while (!q.empty()) {
+        Node current = q.front(); q.pop();
+        int dist = std::abs(target.x - current.pos.x) + std::abs(target.y - current.pos.y);
+        if (dist < bestDist) {
+            bestDist = dist;
+            bestDir = current.firstStep;
+        }
+        if (current.depth >= 2) continue;
+
+        for (Direction d : directions) {
+            Position next = current.pos.move(d);
+            if (next.x < 0 || next.x >= width || next.y < 0 || next.y >= height) continue;
+            if (visited[hash(next)]) continue;
+            const Tile& t = board.getTile(next);
+            if (t.isWall() || t.isMine() || t.isOccupied()) continue;
+            visited[hash(next)] = true;
+            q.push({next, current.firstStep, current.depth + 1});
         }
     }
-    return TankAction::None;
+
+    return (bestDir == dir) ? TankAction::MoveForward : rotateToward(dir, bestDir);
 }

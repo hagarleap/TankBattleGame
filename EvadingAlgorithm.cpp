@@ -1,4 +1,3 @@
-// EvadingAlgorithm.cpp
 #include "EvadingAlgorithm.h"
 #include <cmath>
 

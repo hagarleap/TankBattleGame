@@ -5,9 +5,11 @@
 #include <algorithm>
 
 GameManager::GameManager(Board& board,
-                          std::vector<Tank>& player1Tanks,
-                          std::vector<Tank>& player2Tanks)
-    : board(board), player1Tanks(player1Tanks), player2Tanks(player2Tanks) {}
+                        std::shared_ptr<StrategyManager> smP1,
+                        std::shared_ptr<StrategyManager> smP2,
+                        std::vector<Tank>& player1Tanks,
+                        std::vector<Tank>& player2Tanks)
+    : board(board), strategyP1(smP1), strategyP2(smP2),  player1Tanks(player1Tanks), player2Tanks(player2Tanks) {}
 
 void GameManager::run(int maxSteps) {
     while (!gameOver && stepCounter < maxSteps*2) {
@@ -46,16 +48,15 @@ void GameManager::run(int maxSteps) {
 
 void GameManager::tick() {
     for (auto& tank : player1Tanks){
-    TankAction action = TestAlgorithm::getNextAction(tank);
-    handleTankAction(tank, action);
+        TankAction action = strategyP1->getAction(tank.getTankId(), tank, board, shells);
+        handleTankAction(tank, action);
     }
 
     for (auto& tank : player2Tanks){
-    TankAction action = TestAlgorithm::getNextAction(tank);
-    std::cout << to_string(action) << std::endl;
-    handleTankAction(tank, action);
-    }
-    
+        TankAction action = strategyP2->getAction(tank.getTankId(), tank, board, shells);
+        handleTankAction(tank, action);
+    }   
+  
 }
 
 void GameManager::handleTankAction(Tank& tank, TankAction& action) {
