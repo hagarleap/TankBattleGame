@@ -16,6 +16,10 @@ Position Shell::getPosition() const {
     return position;
 }
 
+Direction Shell::getDirection() const {
+    return direction;
+}
+
 bool Shell::isActive() const {
     return active;
 }
