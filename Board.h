@@ -11,7 +11,11 @@ public:
     Board(int width, int height);
     
     bool loadFromFile(const std::string& filename, std::vector<Position>& tankPositionsP1, std::vector<Position>& tankPositionsP2);
-    
+    void placeWall(const Position& pos);
+    void placeMine(const Position& pos);
+    void placeTank(const Position& pos, int playerId);
+
+    Position wrapPosition(const Position& pos) const;
     int getWidth() const;
     int getHeight() const;
     
