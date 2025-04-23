@@ -12,7 +12,8 @@ public:
     Position move(Direction dir, int steps = 1) const;
 
     bool operator==(const Position& other) const;
-    bool operator!=(const Position& other) const;
+
+    
 };
 
 #endif // POSITION_H

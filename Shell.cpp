@@ -1,23 +1,15 @@
 #include "Shell.h"
+#include "Board.h"
+
 
 Shell::Shell(Position pos, Direction dir)
     : position(pos), direction(dir), active(true) {}
 
-void Shell::advance() {
+void Shell::advance(Board& board) {
     if (!active) return;
-
-    // Move by ±2 units in x/y depending on direction
-    switch (direction) {
-        case Direction::R: position.x += 1; break;
-        case Direction::L: position.x -= 1; break;
-        case Direction::U: position.y += 1; break;
-        case Direction::D: position.y -= 1; break;
-        case Direction::UL: position.x -= 1; position.y += 1; break;
-        case Direction::UR: position.x += 1; position.y +=1; break;
-        case Direction::DL: position.x -= 1; position.y -= 1; break;
-        case Direction:: DR: position.x += 1; position.y -= 1; break;
-        default: break;
-    }
+    Position newPos = position.move(direction, 1);
+    position = board.wrapPosition(newPos);
+    
 }
 
 Position Shell::getPosition() const {

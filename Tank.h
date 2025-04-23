@@ -20,9 +20,6 @@ public:
     void setPosition(const Position& newPos);
     void setDirection(Direction newDir);
 
-    void queueAction(TankAction action);
-    TankAction nextAction();
-
     bool canShoot() const;
     void onShoot();
     void moveForward();
@@ -43,8 +40,8 @@ public:
     std::string toString() const;
 
 private:
-int tankId;
 int playerId;
+int tankId;
 Position position;
 Position previousPosition; 
 Direction direction;

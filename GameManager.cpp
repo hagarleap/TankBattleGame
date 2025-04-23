@@ -1,21 +1,19 @@
 #include "GameManager.h"
+#include "TestAlgorithm.h"
 #include <iostream>
 #include <bits/algorithmfwd.h>
+#include <algorithm>
 
-GameManager::GameManager(Board board,
-                         const std::vector<Position>& spawnP1,
-                         const std::vector<Position>& spawnP2)
-    : board(std::move(board))
-{
-    for (size_t i = 0; i < spawnP1.size(); ++i)
-        player1Tanks.emplace_back(1, static_cast<int>(i), spawnP1[i], Direction::L);
-    for (size_t i = 0; i < spawnP2.size(); ++i)
-        player2Tanks.emplace_back(2, static_cast<int>(i), spawnP2[i], Direction::R);
-}
+GameManager::GameManager(Board& board,
+                          std::vector<Tank>& player1Tanks,
+                          std::vector<Tank>& player2Tanks)
+    : board(board), player1Tanks(player1Tanks), player2Tanks(player2Tanks) {}
 
 void GameManager::run(int maxSteps) {
     while (!gameOver && stepCounter < maxSteps*2) {
-        ++stepCounter;
+        std::cout << "Step " << stepCounter << std::endl;
+        board.print();
+        std::cout << "----------------------" << std::endl;
         moveShells();
         checkCollisions();
         // Game moves by shell steps
@@ -24,34 +22,43 @@ void GameManager::run(int maxSteps) {
             checkCollisions();
         }
         updateBoard();
+
         // Check win/tie conditions 
-        if (player1Tanks.empty() && player2Tanks.empty()) {
+        bool anyAlive1 = std::any_of(player1Tanks.begin(), player1Tanks.end(), [](const Tank& t){ return t.isAlive(); });
+        bool anyAlive2 = std::any_of(player2Tanks.begin(), player2Tanks.end(), [](const Tank& t){ return t.isAlive(); });
+        
+        if (!anyAlive1 && !anyAlive2) {
             gameOver = true;
             resultMessage = "Tie: Both tanks destroyed.";
-        } 
-        else if (player1Tanks.empty()) {
+        } else if (!anyAlive1) {
             gameOver = true;
             resultMessage = "Player 2 wins!";
-        } 
-        else if (player2Tanks.empty()) {
+        } else if (!anyAlive2) {
             gameOver = true;
             resultMessage = "Player 1 wins!";
         }
+        ++stepCounter;
     }
 
-    if (!gameOver)
-        resultMessage = "Tie: Max steps reached.";
+    if (!gameOver){resultMessage = "Tie: Max steps reached.";}
+    
 }
 
 void GameManager::tick() {
-    for (auto& tank : player1Tanks)
-        handleTankAction(tank, tank.nextAction());
+    for (auto& tank : player1Tanks){
+    TankAction action = TestAlgorithm::getNextAction(tank);
+    handleTankAction(tank, action);
+    }
 
-    for (auto& tank : player2Tanks)
-        handleTankAction(tank, tank.nextAction());
+    for (auto& tank : player2Tanks){
+    TankAction action = TestAlgorithm::getNextAction(tank);
+    std::cout << to_string(action) << std::endl;
+    handleTankAction(tank, action);
+    }
+    
 }
 
-void GameManager::handleTankAction(Tank& tank, TankAction action) {
+void GameManager::handleTankAction(Tank& tank, TankAction& action) {
     if (!tank.isAlive()) return;
 
     bool success = true;
@@ -60,7 +67,7 @@ void GameManager::handleTankAction(Tank& tank, TankAction action) {
         case TankAction::Shoot:
             if (tank.canShoot()) {
                 tank.onShoot();
-                shells.emplace_back(tank.getPosition(), tank.getDirection(), tank.getPlayerId());
+                shells.emplace_back(tank.getPosition().move(tank.getDirection()), tank.getDirection());
             } else {
                 success = false;
             }
@@ -75,6 +82,8 @@ void GameManager::handleTankAction(Tank& tank, TankAction action) {
                 success = false;
             } else {
                 tank.moveForward();  // saves previous position
+                Position wrapped = board.wrapPosition(tank.getPosition());
+                tank.setPosition(wrapped);
             }
             break;
         }
@@ -87,6 +96,8 @@ void GameManager::handleTankAction(Tank& tank, TankAction action) {
                 success = false;
             } else {
                 tank.moveBackward();  // saves previous position
+                Position wrapped = board.wrapPosition(tank.getPosition());
+                tank.setPosition(wrapped);
             }
             break;
         }
@@ -121,7 +132,7 @@ void GameManager::handleTankAction(Tank& tank, TankAction action) {
 void GameManager::moveShells() {
     for (Shell& shell : shells) {
         
-        shell.advance();
+        shell.advance(board);
         
     }
 }
@@ -135,8 +146,7 @@ void GameManager::updateBoard() {
 
             // Don't clear walls or mines
             if (tile.getType() == TileType::TANK1 ||
-                tile.getType() == TileType::TANK2 ||
-                tile.getType() == TileType::SHELL) {
+                tile.getType() == TileType::TANK2) {
                 tile.setType(TileType::EMPTY);
             }
         }
@@ -155,16 +165,6 @@ void GameManager::updateBoard() {
         }
     }
 
-    // 3. Optional: mark shell positions (if you want them on the tile map)
-    for (const Shell& shell : shells) {
-        const Position& pos = shell.getPosition();
-        Tile& tile = board.getTile(pos);
-
-        // Don't overwrite tanks, just place shell marker on empty tiles
-        if (tile.getType() == TileType::EMPTY) {
-            tile.setType(TileType::SHELL);
-        }
-    }
 }
 
 
@@ -179,9 +179,11 @@ void GameManager::checkCollisions() {
 
         // 1.1 Shell–shell
         for (size_t j = i + 1; j < shells.size(); ++j) {
+            std::cout << "checking" << std::endl;
             if (shells[j].getPosition() == pos1) {
                 shellsToRemove.push_back(i);
                 shellsToRemove.push_back(j);
+                std::cout << "Shell collided!" << std::endl;
                 goto next_shell;
             }
         }
@@ -228,20 +230,20 @@ void GameManager::checkCollisions() {
         Position pos = tank.getPosition();
         Tile& tile = board.getTile(pos);
 
-        // Tank on a wall – cancel move
+        // 2.1 Tank on wall – revert move
         if (tile.isWall()) {
-            tank.cancelMove(); // custom method: restore previous position
+            tank.cancelMove();
             return;
         }
 
-        // Tank on a mine – destroy
+        // 2.2 Tank on mine – destroy
         if (tile.isMine()) {
             tank.destroy();
             tile.setType(TileType::EMPTY);
             return;
         }
 
-        // Tank on a shell – destroy
+        // 2.3 Tank on shell – destroy
         for (Shell& shell : shells) {
             if (shell.getPosition() == pos) {
                 tank.destroy();
@@ -250,7 +252,7 @@ void GameManager::checkCollisions() {
             }
         }
 
-        // Tank collided with another tank – destroy both
+        // 2.4 Tank collides with enemy tank – destroy both
         for (Tank& enemy : enemyTanks) {
             if (enemy.isAlive() && enemy.getPosition() == pos) {
                 tank.destroy();
@@ -274,6 +276,7 @@ void GameManager::checkCollisions() {
 }
 
 
+
 void GameManager::recordAction(int playerId, int tankId, TankAction action, bool success) {
     std::string logEntry = "P" + std::to_string(playerId) + "-T" + std::to_string(tankId) +
                            ": " + std::string(to_string(action)) +
@@ -287,3 +290,8 @@ void GameManager::writeLog(const std::string& outputFile) const {
         out << entry << "\n";
     out << "Result: " << resultMessage << "\n";
 }
+
+std::string GameManager::getResultMessage() const {
+    return resultMessage;
+}
+

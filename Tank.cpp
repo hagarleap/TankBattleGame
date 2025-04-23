@@ -50,7 +50,13 @@ void Tank::cancelMove() {
     position = previousPosition;
 }
 
-void Tank::setDirection(Direction newDir) {
+void Tank::setPosition(const Position &newPos){
+    previousPosition = position;
+    position = newPos;
+}
+
+void Tank::setDirection(Direction newDir)
+{
     direction = newDir;
 }
 

@@ -1,6 +1,6 @@
 #include "Direction.h"
 
-Direction rotate8(Direction dir) {
+Direction rotateL8(Direction dir) {
     return static_cast<Direction>((static_cast<int>(dir) + 7) % 8);
 }
 

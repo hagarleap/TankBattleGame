@@ -4,8 +4,29 @@
 #include <iostream>
 #include <cctype>
 
-bool InputParser::parseFile(
-    const std::string& filename,
+bool InputParser::getBoardDimensions(const std::string& filename, int& width, int& height, std::vector<std::string>& inputErrors) {
+    std::ifstream inFile(filename);
+    if (!inFile.is_open()) {
+        inputErrors.push_back("Cannot open file: " + filename);
+        return false;
+    }
+
+    std::string line;
+    if (std::getline(inFile, line)) {
+        std::istringstream iss(line);
+        if (!(iss >> width >> height)) {
+            inputErrors.push_back("Invalid board dimensions line.");
+            return false;
+        }
+        return true;
+    }
+
+    inputErrors.push_back("File is empty or missing dimensions.");
+    return false;
+}
+
+
+bool InputParser::parseFile(const std::string& filename,
     Board& board,
     std::vector<Tank>& player1Tanks,
     std::vector<Tank>& player2Tanks,
@@ -32,16 +53,13 @@ bool InputParser::parseFile(
         return false;
     }
 
-    board = Board(width, height);
     int currentRow = 0;
-
     int tank1Count = 0;
     int tank2Count = 0;
-    int tankIdCounter = 0;
 
     while (std::getline(inFile, line) && currentRow < height) {
         for (int col = 0; col < width; ++col) {
-            char ch = (col < line.size()) ? line[col] : ' ';
+            char ch = (col < int(line.size())) ? line[col] : ' ';
 
             Position pos(col, currentRow);
 
@@ -54,7 +72,7 @@ bool InputParser::parseFile(
                     break;
                 case '1':
                     if (tank1Count == 0) {
-                        player1Tanks.emplace_back(tankIdCounter++, 1, pos, Direction::L); // cannon left
+                        player1Tanks.emplace_back(1, tank1Count, pos, Direction::L); // cannon left
                         board.placeTank(pos, 1);
                         tank1Count++;
                     } else {
@@ -63,7 +81,7 @@ bool InputParser::parseFile(
                     break;
                 case '2':
                     if (tank2Count == 0) {
-                        player2Tanks.emplace_back(tankIdCounter++, 2, pos, Direction::R); // cannon right
+                        player2Tanks.emplace_back(2, tank2Count, pos, Direction::R); // cannon right
                         board.placeTank(pos, 2);
                         tank2Count++;
                     } else {
@@ -81,6 +99,7 @@ bool InputParser::parseFile(
         }
         currentRow++;
     }
+    std::cout << "✅ Parsing Done!" << std::endl;
 
     // Handle too few or too many rows
     if (currentRow < height) {

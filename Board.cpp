@@ -46,6 +46,29 @@ bool Board::loadFromFile(const std::string& filename, std::vector<Position>& tan
     return true;
 }
 
+void Board::placeWall(const Position& pos) {
+    tiles[pos.y][pos.x] = Tile(TileType::WALL, pos);
+}
+
+void Board::placeMine(const Position& pos) {
+    tiles[pos.y][pos.x] = Tile(TileType::MINE, pos);
+}
+
+void Board::placeTank(const Position& pos, int playerId) {
+    if (playerId == 1) {
+        tiles[pos.y][pos.x] = Tile(TileType::TANK1, pos);
+    } else if (playerId == 2) {
+        tiles[pos.y][pos.x] = Tile(TileType::TANK2, pos);
+    }
+}
+
+
+Position Board::wrapPosition(const Position& pos) const {
+    int newX = (pos.x + width) % width;
+    int newY = (pos.y + height) % height;
+    return Position(newX, newY);
+}
+
 int Board::getWidth() const { return width; }
 int Board::getHeight() const { return height; }
 

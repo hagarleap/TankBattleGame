@@ -14,4 +14,6 @@ public:
         std::vector<Tank>& player2Tanks,
         std::vector<std::string>& inputErrors
     );
+    static bool getBoardDimensions(const std::string& filename, int& width, int& height, std::vector<std::string>& inputErrors);
+
 };
