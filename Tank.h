@@ -27,7 +27,15 @@ public:
     void rotateRight8();
     void rotateLeft4();
     void rotateLeft8();
+
     void moveBackward();
+    void requestBackward();
+    void cancelBackward();
+    bool isWaitingForBackward() const;
+    bool isReadyToMoveBackward();
+    void stepBackwardTimer();
+    void resetBackwardState();
+    
     void cancelMove();
     void tickCooldown();
 
@@ -48,7 +56,9 @@ Direction direction;
 int shellsLeft = 16;
 int shootCooldown = 0;
 bool destroyed = false;
-int backwardState = 0;
+int backwardStepCounter = -1;  // -1 means no backward requested
+bool inBackwardMode = false;
+
 };
 
 #endif // TANK_H
