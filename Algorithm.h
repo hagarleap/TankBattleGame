@@ -7,6 +7,7 @@
 #include "Shell.h"
 #include <vector>
 #include <string>
+#include <iostream>
 
 class Algorithm {
 public:

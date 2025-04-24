@@ -2,6 +2,7 @@
 #include <cmath>
 
 TankAction EvadingAlgorithm::decideAction(const Tank& tank, const Board& board, const std::vector<Shell>& shells) {
+    (void)board;
     Position myPos = tank.getPosition();
     for (const Shell& shell : shells) {
         Position sPos = shell.getPosition();

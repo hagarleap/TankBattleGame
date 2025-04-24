@@ -25,9 +25,9 @@ int dx(Direction dir) {
     switch (dir) {
         case Direction::L:  return -1;
         case Direction::R:  return 1;
-        case Direction::UL:
+        case Direction::UL: return -1;
         case Direction::DL: return -1;
-        case Direction::UR:
+        case Direction::UR: return 1;
         case Direction::DR: return 1;
         default:            return 0;
     }
@@ -37,9 +37,9 @@ int dy(Direction dir) {
     switch (dir) {
         case Direction::U:  return -1;
         case Direction::D:  return 1;
-        case Direction::UL:
+        case Direction::UL: return -1;
         case Direction::UR: return -1;
-        case Direction::DL:
+        case Direction::DL: return 1;
         case Direction::DR: return 1;
         default:            return 0;
     }
