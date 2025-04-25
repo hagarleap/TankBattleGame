@@ -1,0 +1,4 @@
+1. We created an "algorithm" that allows for inline play! In main.cpp, you can change one (or both for a two-player experience) of the algorithms to "UserInputAlgorithm" and compile!
+You will be prompted in the terminal for your input, with instructions as well as info on your current direction.
+
+2. We further enhanced the player/viewer experience by printing out the game map for each turn. This is helpful when playing in input mode, and nice to see in two automatic algorithms mode.
