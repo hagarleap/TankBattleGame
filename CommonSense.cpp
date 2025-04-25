@@ -1,18 +1,27 @@
 #include "Algorithm.h"
 #include <cmath>
 
-bool isDangerousPosition(const Position& pos, const Board& board, const std::vector<Shell>& shells) {
+bool isDangerousPosition(const Position& pos, const Board& board, const std::vector<Shell>& shells, const Tank& self) {
     for (const Shell& shell : shells) {
         Position sPos = shell.getPosition();
         Direction dir = shell.getDirection();
-        for (int i = 1; i <= 3; ++i) {
-            Position next = sPos.move(dir, 2 * i);
+        for (int i = 1; i <= 6; ++i) {
+            Position next = board.wrapPosition(sPos.move(dir, i));
             if (next == pos) return true;
             if (board.getTile(next).isWall()) break;
         }
     }
-    return board.getTile(pos).isMine() || board.getTile(pos).isOccupied();
+    
+    const Tile& tile = board.getTile(board.wrapPosition(pos));
+    if (tile.isMine()) return true;
+
+    // Ignore self
+    if (tile.isTank1() && self.getPlayerId() == 1) return false;
+    if (tile.isTank2() && self.getPlayerId() == 2) return false;
+
+    return tile.isOccupied();
 }
+
 
 bool canShootOpponent(const Tank& tank, const Board& board) {
     Position pos = tank.getPosition();
@@ -56,9 +65,9 @@ TankAction applyCommonSense(const Tank& tank, const Board& board, const std::vec
     Position forward = pos.move(dir);
     Position backward = pos.move(opposite(dir));
 
-    bool dangerHere = isDangerousPosition(pos, board, shells);
-    bool dangerForward = isDangerousPosition(forward, board, shells);
-    bool dangerBackward = isDangerousPosition(backward, board, shells);
+    bool dangerHere = isDangerousPosition(pos, board, shells, tank);
+    bool dangerForward = isDangerousPosition(forward, board, shells, tank);
+    bool dangerBackward = isDangerousPosition(backward, board, shells, tank);
 
     if ((proposed == TankAction::None || proposed == TankAction::RotateLeft8 || proposed == TankAction::RotateRight8 || proposed == TankAction::RotateLeft4 || proposed == TankAction::RotateRight4) && dangerHere) {
         if (!dangerForward) {
@@ -100,7 +109,7 @@ TankAction applyCommonSense(const Tank& tank, const Board& board, const std::vec
                     Position enemy = {x, y};
                     int dist = std::max(std::abs(enemy.x - pos.x), std::abs(enemy.y - pos.y));
                     Direction toEnemy = directionTo(pos, enemy);
-                    if (dist <= 4) {
+                    if (dist <= 2) {
                         if (dir == toEnemy) {
                             reason = "Enemy is in range and aligned, override to shoot";
                             return TankAction::Shoot;
