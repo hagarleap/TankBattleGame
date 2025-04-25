@@ -1,9 +1,14 @@
-#include <iostream>
-#include <vector>
 #include "Board.h"
 #include "Tank.h"
-#include "InputParser.h"
 #include "GameManager.h"
+#include "InputParser.h"
+#include "StrategyManager.h"
+#include "UserInputAlgorithm.h"
+#include "ChasingAlgorithm.h"
+#include "EvadingAlgorithm.h"
+#include <iostream>
+#include <memory>
+#include <vector>
 
 int main(int argc, char* argv[]) {
     std::cout << "🛠️ Program started..." << std::endl;
@@ -40,8 +45,16 @@ int main(int argc, char* argv[]) {
         }
     }
     std::cout << "✅ Starting game loop" << std::endl;
-    GameManager manager(board, player1Tanks, player2Tanks);
-    manager.run(20); // maxSteps = 100
+  
+    auto sm1 = std::make_shared<StrategyManager>();
+    auto sm2 = std::make_shared<StrategyManager>();
+
+    sm1->assignAlgorithm(0, std::make_shared<EvadingAlgorithm>());
+    sm2->assignAlgorithm(0, std::make_shared<ChasingAlgorithm>());
+
+    GameManager manager(board, sm1, sm2, player1Tanks, player2Tanks);
+    manager.run(100); // maxSteps = 100
+
     std::cout << "✅ GameManager finished running" << std::endl;
     std::cout << manager.getResultMessage() << std::endl;
     return 0;

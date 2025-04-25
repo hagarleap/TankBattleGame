@@ -4,6 +4,8 @@
 #include "Algorithm.h"
 #include <memory>
 #include <unordered_map>
+#include <iostream>
+
 
 class StrategyManager {
 public:
