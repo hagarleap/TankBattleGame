@@ -84,7 +84,7 @@ TankAction ChasingAlgorithm::decideAction(const Tank& tank, const Board& board, 
 
     if (path.empty()) {
     // Path not reachable in 1 move — rotate toward target as fallback
-    Direction toTarget = directionTo(start, target);
+    Direction toTarget = directionTo(start, target, board.getWidth(), board.getHeight());
     if (toTarget != dir) return rotateToward(dir, toTarget);
     return TankAction::None;
 }

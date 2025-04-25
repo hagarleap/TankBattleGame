@@ -1,11 +1,11 @@
-#ifndef EVADINGALGORITHM_H
-#define EVADINGALGORITHM_H
+#ifndef SHOOTINGALGORITHM_H
+#define SHOOTINGALGORITHM_H
 
 #include "Algorithm.h"
 
-class EvadingAlgorithm : public Algorithm {
+class ShootingAlgorithm : public Algorithm {
 public:
     TankAction decideAction(const Tank& tank, const Board& board, const std::vector<Shell>& shells) override;
 };
 
-#endif // EVADINGALGORITHM_H
+#endif // SHOOTINGALGORITHM_H

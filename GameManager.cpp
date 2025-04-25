@@ -70,16 +70,14 @@ void GameManager::tick() {
         }
 
         if (tank.isReadyToMoveBackward()) {
-            Position backPos = tank.getPosition().move(opposite(tank.getDirection()), 1);
+            Position backPos = board.wrapPosition(tank.getPosition().move(opposite(tank.getDirection()), 1));
             Tile& targetTile = board.getTile(backPos);
 
             if (targetTile.isWall() || targetTile.isOccupied()) {
                 success = false;
             } else {
 
-                tank.moveBackward();
-                Position wrapped = board.wrapPosition(tank.getPosition());
-                tank.setPosition(wrapped);
+                tank.moveBackward(board);
             }
 
             tank.resetBackwardState(); 
@@ -118,15 +116,13 @@ void GameManager::tick() {
         }
 
         if (tank.isReadyToMoveBackward()) {
-            Position backPos = tank.getPosition().move(opposite(tank.getDirection()), 1);
+            Position backPos = board.wrapPosition(tank.getPosition().move(opposite(tank.getDirection()), 1));
             Tile& targetTile = board.getTile(backPos);
 
             if (targetTile.isWall()) {
                 success = false;
             } else {
-                tank.moveBackward();
-                Position wrapped = board.wrapPosition(tank.getPosition());
-                tank.setPosition(wrapped);
+                tank.moveBackward(board);
             }
 
             tank.resetBackwardState();
@@ -157,22 +153,20 @@ void GameManager::handleTankAction(Tank& tank, TankAction& action) {
         case TankAction::Shoot:
             if (tank.canShoot()) {
                 tank.onShoot();
-                shells.emplace_back(tank.getPosition().move(tank.getDirection()), tank.getDirection());
+                shells.emplace_back(board.wrapPosition(tank.getPosition().move(tank.getDirection())), tank.getDirection());
             } else {
                 success = false;
             }
             break;
 
         case TankAction::MoveForward: {
-            Position newPos = tank.getPosition().move(tank.getDirection(), 1);
+            Position newPos = board.wrapPosition(tank.getPosition().move(tank.getDirection(), 1));
             Tile& targetTile = board.getTile(newPos);
             // Don't move if wall or tank ahead — mines/shells handled in checkCollisions
             if (targetTile.isWall()) {
                 success = false;
             } else {
-                tank.moveForward();  // saves previous position
-                Position wrapped = board.wrapPosition(tank.getPosition());
-                tank.setPosition(wrapped);
+                tank.moveForward(board);  
             }
             break;
         }
@@ -182,14 +176,12 @@ void GameManager::handleTankAction(Tank& tank, TankAction& action) {
                 // Already waiting, ignore
                 success = false;
             } else if (tank.isReadyToMoveBackward()) {
-                Position backPos = tank.getPosition().move(opposite(tank.getDirection()), 1);
+                Position backPos = board.wrapPosition(tank.getPosition().move(opposite(tank.getDirection()), 1));
                 Tile& targetTile = board.getTile(backPos);
                 if (targetTile.isWall()) {
                     success = false;
                 } else {
-                    tank.moveBackward();
-                    Position wrapped = board.wrapPosition(tank.getPosition());
-                    tank.setPosition(wrapped);
+                    tank.moveBackward(board);
                 }
                 tank.resetBackwardState();
             } else {
