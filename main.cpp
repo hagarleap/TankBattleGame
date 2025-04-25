@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
     }
     std::cout << "✅ Starting game loop" << std::endl;
     GameManager manager(board, player1Tanks, player2Tanks);
-    manager.run(5); // maxSteps = 100
+    manager.run(20); // maxSteps = 100
     std::cout << "✅ GameManager finished running" << std::endl;
     std::cout << manager.getResultMessage() << std::endl;
     return 0;
