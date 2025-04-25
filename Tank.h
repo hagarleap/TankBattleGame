@@ -4,6 +4,7 @@
 #include "Position.h"
 #include "Direction.h"
 #include "TankAction.h"
+#include "Board.h"
 #include <queue>
 #include <string>
 
@@ -22,13 +23,13 @@ public:
 
     bool canShoot() const;
     void onShoot();
-    void moveForward();
+    void moveForward(Board &board);
     void rotateRight4();
     void rotateRight8();
     void rotateLeft4();
     void rotateLeft8();
 
-    void moveBackward();
+    void moveBackward(Board &board);
     void requestBackward();
     void cancelBackward();
     bool isWaitingForBackward() const;

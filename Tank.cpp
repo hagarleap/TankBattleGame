@@ -21,14 +21,15 @@ Direction Tank::getDirection() const {
     return direction;
 }
 
-void Tank::moveForward() {
+void Tank::moveForward(Board &board) {
     previousPosition = position;
-    position = position.move(direction, 1); // move 1 step in current direction
+    position = board.wrapPosition(position.move(direction, 1)); // move 1 step in current direction
 }
 
-void Tank::moveBackward() {
+void Tank::moveBackward(Board &board) {
     previousPosition = position;
-    position = position.move(opposite(direction), 1); // move 1 step backward
+
+    position = board.wrapPosition(position.move(opposite(direction), 1)); // move 1 step backward
     justMovedBackward = true;
 }
 
