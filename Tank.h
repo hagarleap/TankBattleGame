@@ -35,7 +35,9 @@ public:
     bool isReadyToMoveBackward();
     void stepBackwardTimer();
     void resetBackwardState();
-    
+    bool hasJustMovedBackward() const;
+    void clearJustMovedBackwardFlag();
+
     void cancelMove();
     void tickCooldown();
 
@@ -58,7 +60,7 @@ int shootCooldown = 0;
 bool destroyed = false;
 int backwardStepCounter = -1;  // -1 means no backward requested
 bool inBackwardMode = false;
-
+bool justMovedBackward = false;
 };
 
 #endif // TANK_H

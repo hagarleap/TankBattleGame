@@ -29,10 +29,14 @@ void Tank::moveForward() {
 void Tank::moveBackward() {
     previousPosition = position;
     position = position.move(opposite(direction), 1); // move 1 step backward
+    justMovedBackward = true;
 }
 
 void Tank::requestBackward() {
-    if (backwardStepCounter == -1) {
+    if (justMovedBackward){
+        backwardStepCounter = 2;
+    }
+    else if (backwardStepCounter == -1) {
         backwardStepCounter = 0; // start wait timer
         inBackwardMode = true;
     }
@@ -60,7 +64,17 @@ void Tank::cancelBackward() {
 void Tank::resetBackwardState() {
     backwardStepCounter = -1;
     inBackwardMode = false;
+    justMovedBackward = false;
 }
+
+bool Tank::hasJustMovedBackward() const {
+    return justMovedBackward;
+}
+
+void Tank::clearJustMovedBackwardFlag() {
+    justMovedBackward = false;
+}
+
 
 void Tank::rotateRight8() {
     rotateR8(direction); // turn 1/8 right
