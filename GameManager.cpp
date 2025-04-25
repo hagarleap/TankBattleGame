@@ -53,7 +53,7 @@ void GameManager::tick() {
     for (auto& tank : player1Tanks) {
         if (!tank.isAlive()) continue;
 
-            TankAction action = strategyP1->getAction(tank.getTankId(), tank, board, shells);
+        TankAction action = strategyP1->getAction(tank.getTankId(), tank, board, shells);
         bool success = true;
 
         
@@ -65,6 +65,7 @@ void GameManager::tick() {
                 success = false;
                 recordAction(tank.getPlayerId(), tank.getTankId(), action, success);
                 tank.stepBackwardTimer();
+                tank.clearJustMovedBackwardFlag();
                 continue;
             }
         }
@@ -107,10 +108,11 @@ void GameManager::tick() {
         if (tank.isWaitingForBackward()) {
             if (action == TankAction::MoveForward) {
                 tank.cancelBackward();
-            } else if (action != TankAction::MoveBackward) {
+            } else {
                 success = false;
                 recordAction(tank.getPlayerId(), tank.getTankId(), action, success);
                 tank.stepBackwardTimer();
+                tank.clearJustMovedBackwardFlag();
                 continue;
             }
         }
