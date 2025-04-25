@@ -77,19 +77,19 @@ void Tank::clearJustMovedBackwardFlag() {
 
 
 void Tank::rotateRight8() {
-    rotateR8(direction); // turn 1/8 right
+    setDirection(rotateR8(direction)); // turn 1/8 right
 }
 
 void Tank::rotateLeft8() {
-    rotateL8(direction); // turn 1/8 left
+    setDirection(rotateL8(direction)); // turn 1/8 left
 }
 
 void Tank::rotateRight4() {
-    rotateR4(direction); // turn 1/4 right (2 steps)
+    setDirection(rotateR4(direction)); // turn 1/4 right (2 steps)
 }
 
 void Tank::rotateLeft4() {
-    rotateL4(direction); // turn 1/4 left (2 steps)
+    setDirection(rotateL4(direction)); // turn 1/4 left (2 steps)
 }
 
 void Tank::cancelMove() {

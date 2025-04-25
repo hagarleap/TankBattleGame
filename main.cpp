@@ -49,11 +49,12 @@ int main(int argc, char* argv[]) {
     auto sm1 = std::make_shared<StrategyManager>();
     auto sm2 = std::make_shared<StrategyManager>();
 
-    sm1->assignAlgorithm(0, std::make_shared<EvadingAlgorithm>());
+    sm1->assignAlgorithm(0, std::make_shared<UserInputAlgorithm>());
     sm2->assignAlgorithm(0, std::make_shared<ChasingAlgorithm>());
 
     GameManager manager(board, sm1, sm2, player1Tanks, player2Tanks);
     manager.run(100); // maxSteps = 100
+    manager.writeLog("output.txt");
 
     std::cout << "✅ GameManager finished running" << std::endl;
     std::cout << manager.getResultMessage() << std::endl;
