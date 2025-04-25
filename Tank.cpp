@@ -1,5 +1,6 @@
 #include "Tank.h"
 #include <sstream>
+#include <iostream>
 
 Tank::Tank(int playerId, int tankId, Position startPos, Direction startDir)
     : playerId(playerId), tankId(tankId), position(startPos), direction(startDir) {}
@@ -30,6 +31,37 @@ void Tank::moveBackward() {
     position = position.move(opposite(direction), 1); // move 1 step backward
 }
 
+void Tank::requestBackward() {
+    if (backwardStepCounter == -1) {
+        backwardStepCounter = 0; // start wait timer
+        inBackwardMode = true;
+    }
+}
+
+void Tank::stepBackwardTimer() {
+    if (backwardStepCounter >= 0 && backwardStepCounter < 2) {
+        ++backwardStepCounter;
+    }
+}
+
+bool Tank::isWaitingForBackward() const {
+    return backwardStepCounter >= 0 && backwardStepCounter < 2;
+}
+
+bool Tank::isReadyToMoveBackward() {
+    return backwardStepCounter >= 2;
+}
+
+void Tank::cancelBackward() {
+    backwardStepCounter = -1;
+    inBackwardMode = false;
+}
+
+void Tank::resetBackwardState() {
+    backwardStepCounter = -1;
+    inBackwardMode = false;
+}
+
 void Tank::rotateRight8() {
     rotateR8(direction); // turn 1/8 right
 }
@@ -55,23 +87,9 @@ void Tank::setPosition(const Position &newPos){
     position = newPos;
 }
 
-void Tank::setDirection(Direction newDir)
-{
+void Tank::setDirection(Direction newDir){
     direction = newDir;
 }
-
-// void Tank::queueAction(TankAction action) {
-//     actionQueue.push(action);
-// }
-
-
-
-// TankAction Tank::nextAction() {
-//     if (actionQueue.empty()) return TankAction::None;
-//     TankAction action = actionQueue.front();
-//     actionQueue.pop();
-//     return action;
-// }
 
 bool Tank::canShoot() const {
     return shootCooldown == 0 && shellsLeft > 0;

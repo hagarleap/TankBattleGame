@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
         }
     }
     std::cout << "✅ Starting game loop" << std::endl;
-
+  
     auto sm1 = std::make_shared<StrategyManager>();
     auto sm2 = std::make_shared<StrategyManager>();
 
@@ -54,6 +54,7 @@ int main(int argc, char* argv[]) {
 
     GameManager manager(board, sm1, sm2, player1Tanks, player2Tanks);
     manager.run(100); // maxSteps = 100
+
     std::cout << "✅ GameManager finished running" << std::endl;
     std::cout << manager.getResultMessage() << std::endl;
     return 0;

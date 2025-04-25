@@ -13,13 +13,14 @@ GameManager::GameManager(Board& board,
 
 void GameManager::run(int maxSteps) {
     while (!gameOver && stepCounter < maxSteps*2) {
-        std::cout << "Step " << stepCounter << std::endl;
-        board.print();
-        std::cout << "----------------------" << std::endl;
+
         moveShells();
         checkCollisions();
         // Game moves by shell steps
         if (stepCounter%2 == 0){
+            std::cout << "Step " << stepCounter/2 << std::endl;
+            board.print();
+            std::cout << "----------------------" << std::endl;
             tick();
             checkCollisions();
         }
@@ -39,25 +40,113 @@ void GameManager::run(int maxSteps) {
             gameOver = true;
             resultMessage = "Player 1 wins!";
         }
+        writeLog("output.txt");
         ++stepCounter;
     }
 
     if (!gameOver){resultMessage = "Tie: Max steps reached.";}
+    writeLog("output.txt");
     
 }
 
 void GameManager::tick() {
-    for (auto& tank : player1Tanks){
-        TankAction action = strategyP1->getAction(tank.getTankId(), tank, board, shells);
-        handleTankAction(tank, action);
+    for (auto& tank : player1Tanks) {
+        if (!tank.isAlive()) continue;
+
+            TankAction action = strategyP1->getAction(tank.getTankId(), tank, board, shells);
+        bool success = true;
+
+        
+        if (tank.isWaitingForBackward()) {
+            if (action == TankAction::MoveForward) {
+                tank.cancelBackward(); 
+            } else {
+
+                success = false;
+                recordAction(tank.getPlayerId(), tank.getTankId(), action, success);
+                tank.stepBackwardTimer();
+                continue;
+            }
+        }
+
+        if (tank.isReadyToMoveBackward()) {
+            Position backPos = tank.getPosition().move(opposite(tank.getDirection()), 1);
+            Tile& targetTile = board.getTile(backPos);
+
+            if (targetTile.isWall() || targetTile.isOccupied()) {
+                success = false;
+            } else {
+
+                tank.moveBackward();
+                Position wrapped = board.wrapPosition(tank.getPosition());
+                tank.setPosition(wrapped);
+            }
+
+            tank.resetBackwardState(); 
+            recordAction(tank.getPlayerId(), tank.getTankId(), action, success);
+            tank.tickCooldown();
+            continue;
+        }
+
+        if (action == TankAction::MoveBackward) {
+            
+            tank.requestBackward();
+            success = true;
+            recordAction(tank.getPlayerId(), tank.getTankId(), action, success);
+            tank.tickCooldown();
+            continue;
+        }
+
+            handleTankAction(tank, action);
     }
 
-    for (auto& tank : player2Tanks){
+    for (auto& tank : player2Tanks) {
+        if (!tank.isAlive()) continue;
+
         TankAction action = strategyP2->getAction(tank.getTankId(), tank, board, shells);
+        bool success = true;
+
+        if (tank.isWaitingForBackward()) {
+            if (action == TankAction::MoveForward) {
+                tank.cancelBackward();
+            } else if (action != TankAction::MoveBackward) {
+                success = false;
+                recordAction(tank.getPlayerId(), tank.getTankId(), action, success);
+                tank.stepBackwardTimer();
+                continue;
+            }
+        }
+
+        if (tank.isReadyToMoveBackward()) {
+            Position backPos = tank.getPosition().move(opposite(tank.getDirection()), 1);
+            Tile& targetTile = board.getTile(backPos);
+
+            if (targetTile.isWall()) {
+                success = false;
+            } else {
+                tank.moveBackward();
+                Position wrapped = board.wrapPosition(tank.getPosition());
+                tank.setPosition(wrapped);
+            }
+
+            tank.resetBackwardState();
+            recordAction(tank.getPlayerId(), tank.getTankId(), action, success);
+            tank.tickCooldown();
+            continue;
+        }
+
+        if (action == TankAction::MoveBackward) {
+            tank.requestBackward();
+            success = true;
+            recordAction(tank.getPlayerId(), tank.getTankId(), action, success);
+            tank.tickCooldown();
+            continue;
+        }
+
         handleTankAction(tank, action);
-    }   
-  
+    }
 }
+
 
 void GameManager::handleTankAction(Tank& tank, TankAction& action) {
     if (!tank.isAlive()) return;
@@ -77,9 +166,8 @@ void GameManager::handleTankAction(Tank& tank, TankAction& action) {
         case TankAction::MoveForward: {
             Position newPos = tank.getPosition().move(tank.getDirection(), 1);
             Tile& targetTile = board.getTile(newPos);
-
             // Don't move if wall or tank ahead — mines/shells handled in checkCollisions
-            if (targetTile.isWall() || targetTile.isOccupied()) {
+            if (targetTile.isWall()) {
                 success = false;
             } else {
                 tank.moveForward();  // saves previous position
@@ -90,19 +178,25 @@ void GameManager::handleTankAction(Tank& tank, TankAction& action) {
         }
 
         case TankAction::MoveBackward: {
-            Position backPos = tank.getPosition().move(opposite(tank.getDirection()), 1);
-            Tile& targetTile = board.getTile(backPos);
-
-            if (targetTile.isWall() || targetTile.isOccupied()) {
+            if (tank.isWaitingForBackward()) {
+                // Already waiting, ignore
                 success = false;
+            } else if (tank.isReadyToMoveBackward()) {
+                Position backPos = tank.getPosition().move(opposite(tank.getDirection()), 1);
+                Tile& targetTile = board.getTile(backPos);
+                if (targetTile.isWall()) {
+                    success = false;
+                } else {
+                    tank.moveBackward();
+                    Position wrapped = board.wrapPosition(tank.getPosition());
+                    tank.setPosition(wrapped);
+                }
+                tank.resetBackwardState();
             } else {
-                tank.moveBackward();  // saves previous position
-                Position wrapped = board.wrapPosition(tank.getPosition());
-                tank.setPosition(wrapped);
+                tank.requestBackward();
             }
             break;
         }
-
         case TankAction::RotateLeft8:
             tank.rotateLeft8();
             break;
@@ -128,7 +222,6 @@ void GameManager::handleTankAction(Tank& tank, TankAction& action) {
     recordAction(tank.getPlayerId(), tank.getTankId(), action, success);
     tank.tickCooldown();
 }
-
 
 void GameManager::moveShells() {
     for (Shell& shell : shells) {
@@ -168,7 +261,6 @@ void GameManager::updateBoard() {
 
 }
 
-
 void GameManager::checkCollisions() {
     std::vector<size_t> shellsToRemove;
 
@@ -177,14 +269,12 @@ void GameManager::checkCollisions() {
         Shell& shell1 = shells[i];
         Position pos1 = shell1.getPosition();
         Tile& currTile = board.getTile(pos1);
-
         // 1.1 Shell–shell
         for (size_t j = i + 1; j < shells.size(); ++j) {
-            std::cout << "checking" << std::endl;
             if (shells[j].getPosition() == pos1) {
                 shellsToRemove.push_back(i);
                 shellsToRemove.push_back(j);
-                std::cout << "Shell collided!" << std::endl;
+
                 goto next_shell;
             }
         }
@@ -275,8 +365,6 @@ void GameManager::checkCollisions() {
         shells.erase(shells.begin() + *it);
     }
 }
-
-
 
 void GameManager::recordAction(int playerId, int tankId, TankAction action, bool success) {
     std::string logEntry = "P" + std::to_string(playerId) + "-T" + std::to_string(tankId) +
