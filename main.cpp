@@ -47,13 +47,13 @@ int main(int argc, char* argv[]) {
     }
     std::cout << "✅ Starting game loop" << std::endl;
   
-    auto sm1 = std::make_shared<StrategyManager>(true, true); /// passing true twice means 1. using the common sense algorithm and 2. using verbose mode shows tank details action made and action overrides if relevant. useful for debugging.
-    auto sm2 = std::make_shared<StrategyManager>(true, true); // it is reccommended to use false if using the UserInputAlgorithm, otherwise it will interfere with the user input if it thinks it is a bad move.
+    auto sm1 = std::make_shared<StrategyManager>(true, false); /// passing true twice means 1. using the common sense algorithm and 2. using verbose mode shows tank details action made and action overrides if relevant. useful for debugging.
+    auto sm2 = std::make_shared<StrategyManager>(true, false); // it is reccommended to use false if using the UserInputAlgorithm, otherwise it will interfere with the user input if it thinks it is a bad move.
 
     sm1->assignAlgorithm(0, std::make_shared<ChasingAlgorithm>());
     sm2->assignAlgorithm(0, std::make_shared<ShootingAlgorithm>());
 
-    GameManager manager(board, sm1, sm2, player1Tanks, player2Tanks, true); // true means verbose mode, false/nothing (default false) means silent mode
+    GameManager manager(board, sm1, sm2, player1Tanks, player2Tanks, false); // true means verbose mode, false/nothing (default false) means silent mode
 
     manager.run(100); // maxSteps = 100
     manager.writeLog("output_" + inputFile);

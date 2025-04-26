@@ -1,4 +1,16 @@
 1. We created an "algorithm" that allows for inline play! In main.cpp, you can change one (or both for a two-player experience) of the algorithms to "UserInputAlgorithm" and compile!
 You will be prompted in the terminal for your input, with instructions as well as info on your current direction.
 
+If you choose to run (for example) two player mode, we reccomend these settings in the main.cpp file: 
+
+    auto sm1 = std::make_shared<StrategyManager>(false, true); /// passing true twice means 1. using the common sense algorithm and 2. using verbose mode shows tank details action made and action overrides if relevant. useful for debugging.
+    auto sm2 = std::make_shared<StrategyManager>(false, true); // it is reccommended to use false if using the UserInputAlgorithm, otherwise it will interfere with the user input if it thinks it is a bad move.
+
+    sm1->assignAlgorithm(0, std::make_shared<UserInputAlgorithm>());
+    sm2->assignAlgorithm(0, std::make_shared<UserInputAlgorithm>());
+
+    GameManager manager(board, sm1, sm2, player1Tanks, player2Tanks, true); // true means verbose mode, false/nothing (default false) means silent mode
+    
+the true flags will include printouts that will show you the map. the false flags will trun off CommonSense mode- a mode that overrides free will in favor of avoiding danger and shooting nearby enemies.
+
 2. We further enhanced the player/viewer experience by printing out the game map for each turn. This is helpful when playing in input mode, and nice to see in two automatic algorithms mode.
