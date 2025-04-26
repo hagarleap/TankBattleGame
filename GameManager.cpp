@@ -211,6 +211,7 @@ void GameManager::handleTankAction(Tank& tank, TankAction& action) {
             break;
 
         case TankAction::None:
+            break;
         default:
             success = false;
             break;

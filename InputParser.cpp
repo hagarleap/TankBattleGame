@@ -68,7 +68,7 @@ bool InputParser::parseFile(const std::string& filename,
                     if (player1TanksCount >= 1) {
                         inputErrors.push_back("Multiple tanks for player 1 detected at (" + std::to_string(col) + "," + std::to_string(row) + ")");
                     } else {
-                        player1Tanks.emplace_back(1, player1TanksCount, Position(col, row), Direction::U);
+                        player1Tanks.emplace_back(1, player1TanksCount, Position(col, row), Direction::L);
                         tile.setType(TileType::TANK1);
                         ++player1TanksCount;
                     }
@@ -77,7 +77,7 @@ bool InputParser::parseFile(const std::string& filename,
                     if (player2TanksCount >= 1) {
                         inputErrors.push_back("Multiple tanks for player 2 detected at (" + std::to_string(col) + "," + std::to_string(row) + ")");
                     } else {
-                        player2Tanks.emplace_back(2, player2TanksCount, Position(col, row), Direction::U);
+                        player2Tanks.emplace_back(2, player2TanksCount, Position(col, row), Direction::R);
                         tile.setType(TileType::TANK2);
                         ++player2TanksCount;
                     }
