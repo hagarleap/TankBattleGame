@@ -54,6 +54,7 @@ int main(int argc, char* argv[]) {
     sm2->assignAlgorithm(0, std::make_shared<ShootingAlgorithm>());
 
     GameManager manager(board, sm1, sm2, player1Tanks, player2Tanks, true); // true means verbose mode, false/nothing (default false) means silent mode
+
     manager.run(100); // maxSteps = 100
     manager.writeLog("output_" + inputFile);
 
