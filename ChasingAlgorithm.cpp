@@ -74,7 +74,7 @@ TankAction ChasingAlgorithm::decideAction(const Tank& tank, const Board& board, 
 
         int h = hash(target);
         if (!visited[h]) {
-            std::cout << "Target not reachable" << std::endl;
+            //std::cout << "Target not reachable" << std::endl;
             cachedDirection = Direction::U; // fallback
             return TankAction::None;
         }
