@@ -1,0 +1,7 @@
+P1-T0: Rotate Left 1/8
+P2-T0: Move Forward
+P1-T0: Move Forward
+P2-T0: Move Forward
+P1-T0: Shoot
+P2-T0: Rotate Left 1/8
+Result: Player 1 wins!
