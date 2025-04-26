@@ -6,7 +6,7 @@ CXXFLAGS = -Wall -Wextra -Wpedantic -std=c++20
 SRCS := $(wildcard *.cpp)
 
 # Output executable
-TARGET = TankGame
+TARGET = tanks_game
 
 # Default build rule
 all: $(TARGET)

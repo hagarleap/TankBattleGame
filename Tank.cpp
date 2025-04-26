@@ -28,7 +28,6 @@ void Tank::moveForward(Board &board) {
 
 void Tank::moveBackward(Board &board) {
     previousPosition = position;
-
     position = board.wrapPosition(position.move(opposite(direction), 1)); // move 1 step backward
     justMovedBackward = true;
 }

@@ -1,0 +1,41 @@
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward (BAD STEP)
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward (BAD STEP)
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+P1-T0: Move Backward
+P2-T0: None (BAD STEP)
+Result: Tie: Max steps reached.
