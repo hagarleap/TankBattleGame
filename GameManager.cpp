@@ -43,13 +43,9 @@ void GameManager::run(int maxSteps) {
             gameOver = true;
             resultMessage = "Player 1 wins!";
         }
-        writeLog("output.txt");
         ++stepCounter;
     }
-
     if (!gameOver){resultMessage = "Tie: Max steps reached.";}
-    writeLog("output.txt");
-    
 }
 
 void GameManager::tick() {
