@@ -1,113 +1,114 @@
 #include "InputParser.h"
+#include "Tile.h"
+#include "Tank.h"
 #include <fstream>
-#include <sstream>
 #include <iostream>
-#include <cctype>
 
-bool InputParser::getBoardDimensions(const std::string& filename, int& width, int& height, std::vector<std::string>& inputErrors) {
-    std::ifstream inFile(filename);
-    if (!inFile.is_open()) {
-        inputErrors.push_back("Cannot open file: " + filename);
-        return false;
+std::pair<int, int> InputParser::getBoardDimensions(const std::string& filename) {
+    std::ifstream inputFile(filename);
+    if (!inputFile) {
+        std::cerr << "Error: Cannot open input file: " << filename << std::endl;
+        return {-1, -1};
     }
 
-    std::string line;
-    if (std::getline(inFile, line)) {
-        std::istringstream iss(line);
-        if (!(iss >> width >> height)) {
-            inputErrors.push_back("Invalid board dimensions line.");
-            return false;
-        }
-        return true;
+    int width, height;
+    inputFile >> width >> height;
+    if (inputFile.fail() || width <= 0 || height <= 0) {
+        std::cerr << "Error: Invalid board dimensions." << std::endl;
+        return {-1, -1};
     }
-
-    inputErrors.push_back("File is empty or missing dimensions.");
-    return false;
+    return {width, height};
 }
-
 
 bool InputParser::parseFile(const std::string& filename,
     Board& board,
     std::vector<Tank>& player1Tanks,
     std::vector<Tank>& player2Tanks,
-    std::vector<std::string>& inputErrors
-) {
-    std::ifstream inFile(filename);
-    if (!inFile.is_open()) {
-        std::cerr << "Error: Cannot open file " << filename << std::endl;
+    std::vector<std::string>& inputErrors)
+{
+    std::ifstream inputFile(filename);
+    if (!inputFile) {
+        std::cerr << "Error: Cannot open input file: " << filename << std::endl;
         return false;
     }
 
-    int width = 0, height = 0;
+    int width, height;
+    inputFile >> width >> height;
+    if (inputFile.fail() || width <= 0 || height <= 0) {
+        std::cerr << "Error: Invalid board dimensions." << std::endl;
+        return false;
+    }
+
     std::string line;
+    std::getline(inputFile, line); // consume the rest of the first line
 
-    // First line: dimensions
-    if (std::getline(inFile, line)) {
-        std::istringstream iss(line);
-        if (!(iss >> width >> height)) {
-            inputErrors.push_back("Invalid board dimensions.");
-            return false;
+    int player1TanksCount = 0;
+    int player2TanksCount = 0;
+    int row = 0;
+
+    while (std::getline(inputFile, line)) {
+        if (row >= board.getHeight()) {
+            inputErrors.push_back("Extra row detected beyond declared board height at row " + std::to_string(row));
+            continue;
         }
-    } else {
-        inputErrors.push_back("File is empty.");
-        return false;
-    }
 
-    int currentRow = 0;
-    int tank1Count = 0;
-    int tank2Count = 0;
-
-    while (std::getline(inFile, line) && currentRow < height) {
-        for (int col = 0; col < width; ++col) {
+        for (int col = 0; col < board.getWidth(); ++col) {
             char ch = (col < int(line.size())) ? line[col] : ' ';
 
-            Position pos(col, currentRow);
+            Tile& tile = board.getTile(col, row);
 
             switch (ch) {
                 case '#':
-                    board.placeWall(pos);
+                    board.placeWall(Position(col, row));
                     break;
-                case '@':
-                    board.placeMine(pos);
+                case 'M':
+                    board.placeMine(Position(col, row));
                     break;
                 case '1':
-                    if (tank1Count == 0) {
-                        player1Tanks.emplace_back(1, tank1Count, pos, Direction::L); // cannon left
-                        board.placeTank(pos, 1);
-                        tank1Count++;
+                    if (player1TanksCount >= 1) {
+                        inputErrors.push_back("Multiple tanks for player 1 detected at (" + std::to_string(col) + "," + std::to_string(row) + ")");
                     } else {
-                        inputErrors.push_back("Multiple tanks found for Player 1; only the first one is used.");
+                        player1Tanks.emplace_back(1, 1, Position(col, row), Direction::U);
+                        tile.setType(TileType::TANK1);
+                        ++player1TanksCount;
                     }
                     break;
                 case '2':
-                    if (tank2Count == 0) {
-                        player2Tanks.emplace_back(2, tank2Count, pos, Direction::R); // cannon right
-                        board.placeTank(pos, 2);
-                        tank2Count++;
+                    if (player2TanksCount >= 1) {
+                        inputErrors.push_back("Multiple tanks for player 2 detected at (" + std::to_string(col) + "," + std::to_string(row) + ")");
                     } else {
-                        inputErrors.push_back("Multiple tanks found for Player 2; only the first one is used.");
+                        player2Tanks.emplace_back(2, 1, Position(col, row), Direction::U);
+                        tile.setType(TileType::TANK2);
+                        ++player2TanksCount;
                     }
                     break;
                 case ' ':
-                    break; // Empty space
+                    // Empty space, nothing to do
+                    break;
                 default:
-                    inputErrors.push_back("Unknown character '" + std::string(1, ch) +
-                                          "' at row " + std::to_string(currentRow) +
-                                          ", col " + std::to_string(col));
+                    inputErrors.push_back("Unknown character '" + std::string(1, ch) + "' at (" + std::to_string(col) + "," + std::to_string(row) + ")");
+                    // Treat as empty tile
                     break;
             }
         }
-        currentRow++;
-    }
-    std::cout << "✅ Parsing Done!" << std::endl;
-
-    // Handle too few or too many rows
-    if (currentRow < height) {
-        inputErrors.push_back("Too few rows in the input file; expected " + std::to_string(height));
+        ++row;
     }
 
-    if (std::getline(inFile, line)) {
-        inputErrors.push_back("Too many rows in the input file; expected " + std::to_string(height));
+    if (row < board.getHeight()) {
+        inputErrors.push_back("Missing rows: Board height declared as " + std::to_string(board.getHeight()) +
+                              " but only " + std::to_string(row) + " rows found");
+    }
+
+    // If there were errors, write them to input_errors.txt
+    if (!inputErrors.empty()) {
+        std::ofstream errFile("input_errors.txt");
+        for (const auto& err : inputErrors) {
+            errFile << err << "\n";
+        }
+        errFile.close();
+        std::cout << "Parsing completed with " << inputErrors.size() << " recoverable errors.\n";
+    } else {
+        std::cout << "Parsing completed with no errors.\n";
     }
 
     return true;
