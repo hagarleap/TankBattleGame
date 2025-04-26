@@ -1,8 +1,18 @@
 #include "StrategyManager.h"
 #include "Algorithm.h"
+#include "ChasingAlgorithm.h"
+
 
 void StrategyManager::assignAlgorithm(int tankId, std::shared_ptr<Algorithm> algo) {
     strategies[tankId] = algo;
+}
+
+void StrategyManager::notifyMapChangedAll() {
+    for (auto& [id, algo] : strategies) {
+        if (auto chase = std::dynamic_pointer_cast<ChasingAlgorithm>(algo)) {
+            chase->notifyMapChanged();
+        }
+    }
 }
 
 TankAction StrategyManager::getAction(int tankId, const Tank& tank, const Board& board, const std::vector<Shell>& shells) {

@@ -50,10 +50,10 @@ int main(int argc, char* argv[]) {
     auto sm2 = std::make_shared<StrategyManager>(true); // it is reccommended to use false if using the UserInputAlgorithm, otherwise it will interfere with the user input if it thinks it is a bad move.
 
     sm1->assignAlgorithm(0, std::make_shared<ChasingAlgorithm>());
-    sm2->assignAlgorithm(0, std::make_shared<UserInputAlgorithm>());
+    sm2->assignAlgorithm(0, std::make_shared<ShootingAlgorithm>());
 
     GameManager manager(board, sm1, sm2, player1Tanks, player2Tanks);
-    manager.run(20); // maxSteps = 100
+    manager.run(100); // maxSteps = 100
     manager.writeLog("output_" + inputFile);
 
     std::cout << "✅ GameManager finished running" << std::endl;
