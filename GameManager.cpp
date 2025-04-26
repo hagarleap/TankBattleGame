@@ -74,14 +74,13 @@ void GameManager::tick() {
             Position backPos = board.wrapPosition(tank.getPosition().move(opposite(tank.getDirection()), 1));
             Tile& targetTile = board.getTile(backPos);
 
-            if (targetTile.isWall() || targetTile.isOccupied()) {
+            if (targetTile.isWall()) {
                 success = false;
             } else {
 
                 tank.moveBackward(board);
             }
 
-            tank.resetBackwardState(); 
             recordAction(tank.getPlayerId(), tank.getTankId(), action, success);
             tank.tickCooldown();
             continue;
@@ -96,7 +95,10 @@ void GameManager::tick() {
             continue;
         }
 
-            handleTankAction(tank, action);
+        handleTankAction(tank, action);
+        if (tank.hasJustMovedBackward() && action != TankAction::MoveBackward) {
+            tank.resetBackwardState();
+        }
     }
 
     for (auto& tank : player2Tanks) {
@@ -127,7 +129,6 @@ void GameManager::tick() {
                 tank.moveBackward(board);
             }
 
-            tank.resetBackwardState();
             recordAction(tank.getPlayerId(), tank.getTankId(), action, success);
             tank.tickCooldown();
             continue;
@@ -142,6 +143,9 @@ void GameManager::tick() {
         }
 
         handleTankAction(tank, action);
+        if (tank.hasJustMovedBackward() && action != TankAction::MoveBackward) {
+            tank.resetBackwardState();
+        }
     }
 }
 
@@ -150,7 +154,6 @@ void GameManager::handleTankAction(Tank& tank, TankAction& action) {
     if (!tank.isAlive()) return;
 
     bool success = true;
-
     switch (action) {
         case TankAction::Shoot:
             if (tank.canShoot()) {
