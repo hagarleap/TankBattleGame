@@ -14,9 +14,9 @@ class StrategyManager {
     
     public:
         StrategyManager(bool useCommonSense = true) : useCommonSense(useCommonSense) {}
-    
         void assignAlgorithm(int tankId, std::shared_ptr<Algorithm> algo);
         TankAction getAction(int tankId, const Tank& tank, const Board& board, const std::vector<Shell>& shells);
+        void notifyMapChangedAll();
     };
 
 #endif // STRATEGYMANAGER_H

@@ -1,0 +1,63 @@
+P1-T0: Shoot
+P2-T0: Shoot
+P1-T0: None (BAD STEP)
+P2-T0: None (BAD STEP)
+P1-T0: None (BAD STEP)
+P2-T0: None (BAD STEP)
+P1-T0: None (BAD STEP)
+P2-T0: None (BAD STEP)
+P1-T0: Shoot
+P2-T0: Shoot
+P1-T0: None (BAD STEP)
+P2-T0: None (BAD STEP)
+P1-T0: None (BAD STEP)
+P2-T0: None (BAD STEP)
+P1-T0: None (BAD STEP)
+P2-T0: None (BAD STEP)
+P1-T0: None (BAD STEP)
+P2-T0: Shoot
+P1-T0: None (BAD STEP)
+P2-T0: None (BAD STEP)
+P1-T0: Shoot
+P2-T0: None (BAD STEP)
+P1-T0: None (BAD STEP)
+P2-T0: None (BAD STEP)
+P1-T0: Rotate Right 1/4
+P2-T0: Shoot
+P1-T0: Move Forward
+P2-T0: None (BAD STEP)
+P1-T0: Move Forward
+P2-T0: Rotate Left 1/8
+P1-T0: Move Forward
+P2-T0: None (BAD STEP)
+P1-T0: Move Forward
+P2-T0: Shoot
+P1-T0: Move Forward
+P2-T0: None (BAD STEP)
+P1-T0: Move Forward
+P2-T0: None (BAD STEP)
+P1-T0: Move Forward
+P2-T0: None (BAD STEP)
+P1-T0: Move Forward
+P2-T0: Move Forward
+P1-T0: Move Forward
+P2-T0: Shoot
+P1-T0: Move Forward
+P2-T0: None (BAD STEP)
+P1-T0: Move Forward
+P2-T0: None (BAD STEP)
+P1-T0: Move Forward
+P2-T0: Move Forward
+P1-T0: Move Forward
+P2-T0: Rotate Right 1/8
+P1-T0: Move Forward
+P2-T0: Move Forward
+P1-T0: Move Forward
+P2-T0: Rotate Right 1/8
+P1-T0: Move Forward
+P2-T0: Shoot
+P1-T0: None (BAD STEP)
+P2-T0: None (BAD STEP)
+P1-T0: Move Forward
+P2-T0: None (BAD STEP)
+Result: Player 2 wins!

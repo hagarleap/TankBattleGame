@@ -280,6 +280,9 @@ void GameManager::checkCollisions() {
         if (currTile.isWall()) {
             currTile.hitWall();
             shellsToRemove.push_back(i);
+            // NEW:
+            if (strategyP1) strategyP1->notifyMapChangedAll();
+            if (strategyP2) strategyP2->notifyMapChangedAll();
             continue;
         }
 
