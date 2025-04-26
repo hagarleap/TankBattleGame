@@ -1,1 +1,1 @@
-Too few rows in the input file; expected 20
+Missing rows: Board height declared as 7 but only 6 rows found
