@@ -11,7 +11,7 @@ To compile, run:
 make       
 
 To run the game, run:
-./TankGame <textfile>
+./tanks_game <textfile>
 
 To clean up after running, run:
 make clean 
