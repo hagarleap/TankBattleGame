@@ -16,7 +16,8 @@ public:
                 std::shared_ptr<StrategyManager> smP1,
                 std::shared_ptr<StrategyManager> smP2,
                 std::vector<Tank>& player1Tanks,
-                std::vector<Tank>& player2Tanks
+                std::vector<Tank>& player2Tanks,
+                bool verbose = false
                 );
 
     void run(int maxSteps = 1000);
@@ -32,7 +33,8 @@ private:
     std::vector<Tank>& player1Tanks;
     std::vector<Tank>& player2Tanks;
     std::vector<Shell> shells;
-
+    
+    bool verbose = false;
     int stepCounter = 0;
     std::vector<std::string> log;
 

@@ -8,8 +8,9 @@ GameManager::GameManager(Board& board,
                         std::shared_ptr<StrategyManager> smP1,
                         std::shared_ptr<StrategyManager> smP2,
                         std::vector<Tank>& player1Tanks,
-                        std::vector<Tank>& player2Tanks)
-    : board(board), strategyP1(smP1), strategyP2(smP2),  player1Tanks(player1Tanks), player2Tanks(player2Tanks) {}
+                        std::vector<Tank>& player2Tanks,
+                        bool verbose)
+    : board(board), strategyP1(smP1), strategyP2(smP2),  player1Tanks(player1Tanks), player2Tanks(player2Tanks), verbose(verbose) {}
 
 void GameManager::run(int maxSteps) {
     while (!gameOver && stepCounter < maxSteps*2) {
@@ -18,9 +19,11 @@ void GameManager::run(int maxSteps) {
         checkCollisions();
         // Game moves by shell steps
         if (stepCounter%2 == 0){
-            std::cout << "Step " << stepCounter/2 << std::endl;
-            board.print();
-            std::cout << "----------------------" << std::endl;
+            if (verbose) {
+                std::cout << "Step " << stepCounter/2 << std::endl;
+                board.print();
+                std::cout << "----------------------" << std::endl;
+            }            
             tick();
             checkCollisions();
         }

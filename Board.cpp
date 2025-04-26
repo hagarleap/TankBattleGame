@@ -90,7 +90,11 @@ const Tile& Board::getTile(Position pos) const {
 
 
 void Board::print() const {
+    // Top border
+    std::cout << "+" << std::string(width, '-') << "+" << std::endl;
+
     for (const auto& row : tiles) {
+        std::cout << "|";
         for (const auto& tile : row) {
             switch (tile.getType()) {
                 case TileType::WALL: std::cout << "#"; break;
@@ -100,6 +104,9 @@ void Board::print() const {
                 default: std::cout << " ";
             }
         }
-        std::cout << "\n";
+        std::cout << "|" << std::endl;
     }
+
+    // Bottom border
+    std::cout << "+" << std::string(width, '-') << "+" << std::endl;
 }
