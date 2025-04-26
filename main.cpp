@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
     std::cout << "🛠️ Program started..." << std::endl;
 
     if (argc != 2) {
-        std::cerr << "Usage: ./TankGame <input_file>" << std::endl;
+        std::cerr << "Usage: ./tanks_game <input_file>" << std::endl;
         return 1;
     }
 
@@ -23,14 +23,15 @@ int main(int argc, char* argv[]) {
     std::vector<Tank> player2Tanks;
     std::vector<std::string> inputErrors;
 
-    int width = 0, height = 0;
-    if (!InputParser::getBoardDimensions(inputFile, width, height, inputErrors)) {
+    // Parse board dimensions
+    auto [width, height] = InputParser::getBoardDimensions(inputFile);
+    if (width <= 0 || height <= 0) {
         std::cerr << "Failed to read board dimensions." << std::endl;
         return 1;
     }
     
     Board board(width, height); 
-    
+    // Parse full input file
     if (!InputParser::parseFile(inputFile, board, player1Tanks, player2Tanks, inputErrors)) {
         std::cerr << "Failed to parse input file." << std::endl;
         return 1;
