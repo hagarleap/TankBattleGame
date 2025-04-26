@@ -21,6 +21,5 @@ bool isDangerousPosition(const Position& pos, const Board& board, const std::vec
 bool canShootOpponent(const Tank& tank, const Board& board);
 Direction directionTo(const Position& from, const Position& to, int width, int height);
 TankAction rotateToward(Direction current, Direction target);
-std::optional<Direction> findSafeDirection(const Position& from, const Board& board, const std::vector<Shell>& shells, const Tank& tank);
 
 #endif // ALGORITHM_H

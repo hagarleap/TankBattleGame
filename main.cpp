@@ -46,10 +46,10 @@ int main(int argc, char* argv[]) {
     }
     std::cout << "✅ Starting game loop" << std::endl;
   
-    auto sm1 = std::make_shared<StrategyManager>();
-    auto sm2 = std::make_shared<StrategyManager>();
+    auto sm1 = std::make_shared<StrategyManager>(true); /// passing true means using the common sense algorithm (one that voids mines, making steps in the path of shells, etc.) 
+    auto sm2 = std::make_shared<StrategyManager>(true); // it is reccommended to use false if using the UserInputAlgorithm, otherwise it will interfere with the user input if it thinks it is a bad move.
 
-    sm1->assignAlgorithm(0, std::make_shared<UserInputAlgorithm>());
+    sm1->assignAlgorithm(0, std::make_shared<ChasingAlgorithm>());
     sm2->assignAlgorithm(0, std::make_shared<ShootingAlgorithm>());
 
     GameManager manager(board, sm1, sm2, player1Tanks, player2Tanks);
