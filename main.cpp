@@ -38,6 +38,14 @@ int main(int argc, char* argv[]) {
     }
     std::cout << "✅ Parsed input file" << std::endl;
 
+    if (player1Tanks.empty()) {
+        std::cerr << "Error: No tanks found for Player 1. Game cannot start." << std::endl;
+        return 1;
+    }
+    if (player2Tanks.empty()) {
+        std::cerr << "Error: No tanks found for Player 2. Game cannot start." << std::endl;
+        return 1;
+    }
 
     if (!inputErrors.empty()) {
         std::ofstream errFile("input_errors.txt");
