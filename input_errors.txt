@@ -1,1 +1,1 @@
-Missing rows: Board height declared as 7 but only 6 rows found
+Unknown character '@' at (4,1)
