@@ -21,7 +21,7 @@ void GameManager::run(int maxSteps) {
         if (stepCounter%2 == 0){
             if (verbose) {
                 std::cout << "Step " << stepCounter/2 << std::endl;
-                board.print();
+                printBoard();
                 std::cout << "----------------------" << std::endl;
             }            
             tick();
@@ -382,5 +382,20 @@ void GameManager::writeLog(const std::string& outputFile) const {
 
 std::string GameManager::getResultMessage() const {
     return resultMessage;
+}
+
+void GameManager::printBoard() const {
+    auto boardLines = board.toString();
+
+    for (const Shell& shell : shells) {
+        Position p = shell.getPosition();
+        if (p.y >= 0 && p.y < board.getHeight() && p.x >= 0 && p.x < board.getWidth()) {
+            boardLines[p.y][p.x] = '*';
+        }
+    }
+
+    for (const std::string& line : boardLines) {
+        std::cout << line << "\n";
+    }
 }
 

@@ -47,6 +47,8 @@ private:
     void checkCollisions();
     void updateBoard();
     void recordAction(int playerId, int tankId, TankAction action, bool success);
+    void printBoard() const;
+
 
 };
 
