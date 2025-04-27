@@ -3,7 +3,7 @@ HW 1 for Adv Coding Topics in C++
 
 Collaborators:
 Hagar Paytan, ID: 206825176
-Omri Kaplan, ID: <insert ID!!>
+Omri Kaplan, ID: 319089256
 
 Our Makefile automatically detects all .cpp files in the folder and compiles them - beware!
 
@@ -11,7 +11,7 @@ To compile, run:
 make       
 
 To run the game, run:
-./TankGame <textfile>
+./tanks_game <textfile>
 
 To clean up after running, run:
 make clean 
@@ -21,15 +21,15 @@ Example input files explaination:
 Setting - Player 1 is the chasing algo, Player 2 is the shooting algo
 
 Input a:
-    - 2 aims at 1, while 1 turns towards the shortest path
-    - 2 then shoots at 1, while 1 starts moving
-    - By the time 2 gets close enough to aim and shoot at 2, 1's initial shell warps around and hits 1 before it can react
+ - 2 aims at 1, while 1 turns towards the shortest path
+ - 2 then shoots at 1, while 1 starts moving
+ - By the time 2 gets close enough to aim and shoot at 2, 1's initial shell warps around and hits 1 before it can react
 
 Input b:
-    - 1 is totally encased in walls, just far away from 2. This means that chasing algo will tell it do do nothing, since there is no path, and common sense won't prompt it to shoot at 2.
-    - 2 will keep shooting towards 1, eventually breaking a wall.
-    - Now that the map changed, 1 will start to move towards 2
-    - by then, 2 has stopped cooldown and shoots 1.
+ - 1 is totally encased in walls, just far away from 2. This means that chasing algo will tell it do do nothing, since there is no path, and common sense won't prompt it to shoot at 2.
+ - 2 will keep shooting towards 1, eventually breaking a wall.
+ - Now that the map changed, 1 will start to move towards 2
+ - by then, 2 has stopped cooldown and shoots 1.
 
 Input c:
  - there is a single diagonal wall between both tanks
