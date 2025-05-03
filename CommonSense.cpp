@@ -40,17 +40,17 @@ Direction directionTo(const Position& from, const Position& to, int width, int h
 }
 
 
-TankAction rotateToward(Direction current, Direction target) {
+ActionRequest rotateToward(Direction current, Direction target) {
     int cur = static_cast<int>(current);
     int tgt = static_cast<int>(target);
     int diff = (tgt - cur + 8) % 8;
-    if (diff == 0) return TankAction::None;
-    if (diff == 1 || diff == 2) return TankAction::RotateRight8;
-    if (diff == 7 || diff == 6) return TankAction::RotateLeft8;
-    return (diff <= 4) ? TankAction::RotateRight4 : TankAction::RotateLeft4;
+    if (diff == 0) return ActionRequest::DoNothing;
+    if (diff == 1 || diff == 2) return ActionRequest::RotateRight45;
+    if (diff == 7 || diff == 6) return ActionRequest::RotateLeft45;
+    return (diff <= 4) ? ActionRequest::RotateRight90 : ActionRequest::RotateLeft90;
 }
 
-TankAction applyCommonSense(const Tank& tank, const Board& board, const std::vector<Shell>& shells, TankAction proposed, std::string& reason) {
+ActionRequest applyCommonSense(const Tank& tank, const Board& board, const std::vector<Shell>& shells, ActionRequest proposed, std::string& reason) {
     Position pos = tank.getPosition();
     Direction dir = tank.getDirection();
     Position forward = pos.move(dir);
@@ -60,19 +60,19 @@ TankAction applyCommonSense(const Tank& tank, const Board& board, const std::vec
     bool dangerForward = isDangerousPosition(forward, board, shells, tank);
     bool dangerBackward = isDangerousPosition(backward, board, shells, tank);
 
-    if ((proposed == TankAction::None || proposed == TankAction::RotateLeft8 || proposed == TankAction::RotateRight8 || proposed == TankAction::RotateLeft4 || proposed == TankAction::RotateRight4) && dangerHere) {
+    if ((proposed == ActionRequest::DoNothing || proposed == ActionRequest::RotateLeft45 || proposed == ActionRequest::RotateRight45 || proposed == ActionRequest::RotateLeft90 || proposed == ActionRequest::RotateRight90) && dangerHere) {
         if (!dangerForward) {
             reason = "Rotating/standing still is fatal, moving forward is safe";
-            return TankAction::MoveForward;
+            return ActionRequest::MoveForward;
         }
         reason = "Rotating/standing still is fatal, shooting as last resort";
-        return TankAction::Shoot;
+        return ActionRequest::Shoot;
     }
 
-    if ((proposed == TankAction::MoveForward && dangerForward) || (proposed == TankAction::MoveBackward && dangerBackward)) {
+    if ((proposed == ActionRequest::MoveForward && dangerForward) || (proposed == ActionRequest::MoveBackward && dangerBackward)) {
 
     // Check if the obstacle is the other tank — don't override, let shooting logic decide
-    Position checkPos = (proposed == TankAction::MoveForward) ? pos.move(dir) : pos.move(opposite(dir));
+    Position checkPos = (proposed == ActionRequest::MoveForward) ? pos.move(dir) : pos.move(opposite(dir));
     checkPos = board.wrapPosition(checkPos);
     const Tile& obstacle = board.getTile(checkPos);
 
@@ -81,25 +81,25 @@ TankAction applyCommonSense(const Tank& tank, const Board& board, const std::vec
     } 
     else if (!dangerHere) {
         reason = "Proposed move is dangerous, staying put is safer";
-        return TankAction::None;
+        return ActionRequest::DoNothing;
     } 
     else {
         reason = "Move leads to death, shooting as last resort";
-        return TankAction::Shoot;
+        return ActionRequest::Shoot;
     }
 }
 
-    if (proposed == TankAction::Shoot && dangerHere) {
+    if (proposed == ActionRequest::Shoot && dangerHere) {
         if (!dangerForward) {
             reason = "Shooting while staying here is fatal, moving forward instead";
-            return TankAction::MoveForward;
+            return ActionRequest::MoveForward;
         }
         reason = "Shooting while staying here is fatal, rotate to reposition";
-        return TankAction::RotateRight8;
+        return ActionRequest::RotateRight45;
     }
 
     // Final layer: shoot if close and aligned, or rotate toward enemy
-    if (proposed != TankAction::Shoot && tank.canShoot()) {
+    if (proposed != ActionRequest::Shoot && tank.canShoot()) {
         for (int y = 0; y < board.getHeight(); ++y) {
             for (int x = 0; x < board.getWidth(); ++x) {
                 const Tile& t = board.getTile(x, y);
@@ -115,7 +115,7 @@ TankAction applyCommonSense(const Tank& tank, const Board& board, const std::vec
                     if (dist <= 2) {
                         if (dir == toEnemy) {
                             reason = "Enemy is in range and aligned, override to shoot";
-                            return TankAction::Shoot;
+                            return ActionRequest::Shoot;
                         } else {
                             reason = "Enemy is close but not aligned, rotate toward them";
                             return rotateToward(dir, toEnemy);

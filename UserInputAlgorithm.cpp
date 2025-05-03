@@ -2,7 +2,7 @@
 #include <iostream>
 #include "Tile.h"
 
-TankAction UserInputAlgorithm::decideAction(const Tank& tank, const Board& board, const std::vector<Shell>& shells) {
+ActionRequest UserInputAlgorithm::decideAction(const Tank& tank, const Board& board, const std::vector<Shell>& shells) {
     (void)shells;
     (void)board;
     std::cout << std::endl;
@@ -24,19 +24,19 @@ TankAction UserInputAlgorithm::decideAction(const Tank& tank, const Board& board
     char c;
     std::cin >> c;
 
-    static const std::unordered_map<char, TankAction> map = {
-        {'f', TankAction::MoveForward},
-        {'b', TankAction::MoveBackward},
-        {'l', TankAction::RotateLeft8},
-        {'r', TankAction::RotateRight8},
-        {'L', TankAction::RotateLeft4},
-        {'R', TankAction::RotateRight4},
-        {'s', TankAction::Shoot},
-        {'n', TankAction::None}
+    static const std::unordered_map<char, ActionRequest> map = {
+        {'f', ActionRequest::MoveForward},
+        {'b', ActionRequest::MoveBackward},
+        {'l', ActionRequest::RotateLeft45},
+        {'r', ActionRequest::RotateRight45},
+        {'L', ActionRequest::RotateLeft90},
+        {'R', ActionRequest::RotateRight90},
+        {'s', ActionRequest::Shoot},
+        {'n', ActionRequest::DoNothing}
     };
 
     auto it = map.find(c);
     if (it != map.end()) return it->second;
     std::cout << "Invalid input, doing nothing.\n";
-    return TankAction::None;
+    return ActionRequest::DoNothing;
 }

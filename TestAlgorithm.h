@@ -1,10 +1,10 @@
 #pragma once
-#include "TankAction.h"
+#include "common/ActionRequest.h"
 #include "Tank.h"
 #include "Board.h"
 #include <vector>
 
 class TestAlgorithm {
 public:
-    static TankAction getNextAction(const Tank& self);
+    static ActionRequest getNextAction(const Tank& self);
 };

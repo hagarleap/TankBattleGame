@@ -9,7 +9,7 @@ class ChasingAlgorithm : public Algorithm {
         bool mapChanged = true;
         Direction cachedDirection = Direction::U; // fallback arbitrary
     public:
-        TankAction decideAction(const Tank& tank, const Board& board, const std::vector<Shell>& shells) override;
+        ActionRequest decideAction(const Tank& tank, const Board& board, const std::vector<Shell>& shells) override;
         void notifyMapChanged();
     };
 

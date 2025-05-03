@@ -1,7 +1,7 @@
 #ifndef ALGORITHM_H
 #define ALGORITHM_H
 
-#include "TankAction.h"
+#include "common/ActionRequest.h"
 #include "Tank.h"
 #include "Board.h"
 #include "Shell.h"
@@ -12,14 +12,14 @@
 
 class Algorithm {
 public:
-    virtual TankAction decideAction(const Tank& tank, const Board& board, const std::vector<Shell>& shells) = 0;
+    virtual ActionRequest decideAction(const Tank& tank, const Board& board, const std::vector<Shell>& shells) = 0;
     virtual ~Algorithm() = default;
 };
 
-TankAction applyCommonSense(const Tank& tank, const Board& board, const std::vector<Shell>& shells, TankAction proposed, std::string& reason);
+ActionRequest applyCommonSense(const Tank& tank, const Board& board, const std::vector<Shell>& shells, ActionRequest proposed, std::string& reason);
 bool isDangerousPosition(const Position& pos, const Board& board, const std::vector<Shell>& shells);
 bool canShootOpponent(const Tank& tank, const Board& board);
 Direction directionTo(const Position& from, const Position& to, int width, int height);
-TankAction rotateToward(Direction current, Direction target);
+ActionRequest rotateToward(Direction current, Direction target);
 
 #endif // ALGORITHM_H
