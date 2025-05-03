@@ -12,7 +12,7 @@ void ChasingAlgorithm::notifyMapChanged() {
     mapChanged = true;
 }
 
-TankAction ChasingAlgorithm::decideAction(const Tank& tank, const Board& board, const std::vector<Shell>& shells) {
+ActionRequest ChasingAlgorithm::decideAction(const Tank& tank, const Board& board, const std::vector<Shell>& shells) {
     (void)shells;
     Position start = tank.getPosition();
     Direction dir = tank.getDirection();
@@ -30,7 +30,7 @@ TankAction ChasingAlgorithm::decideAction(const Tank& tank, const Board& board, 
             }
         }
     }
-    if (target.x == -1) return TankAction::None;
+    if (target.x == -1) return ActionRequest::DoNothing;
 
     // Check if we need to recompute
     if (target != lastTarget || mapChanged) {
@@ -76,7 +76,7 @@ TankAction ChasingAlgorithm::decideAction(const Tank& tank, const Board& board, 
         if (!visited[h]) {
             //std::cout << "Target not reachable" << std::endl;
             cachedDirection = Direction::U; // fallback
-            return TankAction::None;
+            return ActionRequest::DoNothing;
         }
 
         std::vector<Position> path;
@@ -88,7 +88,7 @@ TankAction ChasingAlgorithm::decideAction(const Tank& tank, const Board& board, 
             Direction toTarget = directionTo(start, target, width, height);
             cachedDirection = toTarget;
             if (toTarget != dir) return rotateToward(dir, toTarget);
-            return TankAction::None;
+            return ActionRequest::DoNothing;
         }
 
         Position step = path.back();
@@ -104,7 +104,7 @@ TankAction ChasingAlgorithm::decideAction(const Tank& tank, const Board& board, 
 
     // Use cachedDirection to act
     if (cachedDirection == dir) {
-        return TankAction::MoveForward;
+        return ActionRequest::MoveForward;
     } else {
         return rotateToward(dir, cachedDirection);
     }

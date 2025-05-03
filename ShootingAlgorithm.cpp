@@ -1,7 +1,7 @@
 #include "ShootingAlgorithm.h"
 #include <cmath>
 
-TankAction ShootingAlgorithm::decideAction(const Tank& tank, const Board& board, const std::vector<Shell>& shells) {
+ActionRequest ShootingAlgorithm::decideAction(const Tank& tank, const Board& board, const std::vector<Shell>& shells) {
     (void)shells; // Ignore shells for this algorithm
     Position myPos = tank.getPosition();
     Direction dir = tank.getDirection();
@@ -30,9 +30,9 @@ TankAction ShootingAlgorithm::decideAction(const Tank& tank, const Board& board,
 
     if (enemyFound) {
         Direction toEnemy = directionTo(myPos, closestEnemy, board.getWidth(), board.getHeight());
-        if (dir == toEnemy && tank.canShoot()) return TankAction::Shoot;
+        if (dir == toEnemy && tank.canShoot()) return ActionRequest::Shoot;
         if (dir != toEnemy) return rotateToward(dir, toEnemy);
     }
 
-    return TankAction::None;
+    return ActionRequest::DoNothing;
 }

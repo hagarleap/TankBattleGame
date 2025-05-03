@@ -52,12 +52,12 @@ void GameManager::tick() {
     for (auto& tank : player1Tanks) {
         if (!tank.isAlive()) continue;
 
-        TankAction action = strategyP1->getAction(tank.getTankId(), tank, board, shells);
+        ActionRequest action = strategyP1->getAction(tank.getTankId(), tank, board, shells);
         bool success = true;
 
         
         if (tank.isWaitingForBackward()) {
-            if (action == TankAction::MoveForward) {
+            if (action == ActionRequest::MoveForward) {
                 tank.cancelBackward(); 
             } else {
 
@@ -85,7 +85,7 @@ void GameManager::tick() {
             continue;
         }
 
-        if (action == TankAction::MoveBackward) {
+        if (action == ActionRequest::MoveBackward) {
             
             tank.requestBackward();
             success = true;
@@ -94,8 +94,8 @@ void GameManager::tick() {
             continue;
         }
 
-        handleTankAction(tank, action);
-        if (tank.hasJustMovedBackward() && action != TankAction::MoveBackward) {
+        handleActionRequest(tank, action);
+        if (tank.hasJustMovedBackward() && action != ActionRequest::MoveBackward) {
             tank.resetBackwardState();
         }
     }
@@ -103,11 +103,11 @@ void GameManager::tick() {
     for (auto& tank : player2Tanks) {
         if (!tank.isAlive()) continue;
 
-        TankAction action = strategyP2->getAction(tank.getTankId(), tank, board, shells);
+        ActionRequest action = strategyP2->getAction(tank.getTankId(), tank, board, shells);
         bool success = true;
 
         if (tank.isWaitingForBackward()) {
-            if (action == TankAction::MoveForward) {
+            if (action == ActionRequest::MoveForward) {
                 tank.cancelBackward();
             } else {
                 success = false;
@@ -133,7 +133,7 @@ void GameManager::tick() {
             continue;
         }
 
-        if (action == TankAction::MoveBackward) {
+        if (action == ActionRequest::MoveBackward) {
             tank.requestBackward();
             success = true;
             recordAction(tank.getPlayerId(), tank.getTankId(), action, success);
@@ -141,20 +141,20 @@ void GameManager::tick() {
             continue;
         }
 
-        handleTankAction(tank, action);
-        if (tank.hasJustMovedBackward() && action != TankAction::MoveBackward) {
+        handleActionRequest(tank, action);
+        if (tank.hasJustMovedBackward() && action != ActionRequest::MoveBackward) {
             tank.resetBackwardState();
         }
     }
 }
 
 
-void GameManager::handleTankAction(Tank& tank, TankAction& action) {
+void GameManager::handleActionRequest(Tank& tank, ActionRequest& action) {
     if (!tank.isAlive()) return;
 
     bool success = true;
     switch (action) {
-        case TankAction::Shoot:
+        case ActionRequest::Shoot:
             if (tank.canShoot()) {
                 tank.onShoot();
                 shells.emplace_back(board.wrapPosition(tank.getPosition().move(tank.getDirection())), tank.getDirection());
@@ -163,7 +163,7 @@ void GameManager::handleTankAction(Tank& tank, TankAction& action) {
             }
             break;
 
-        case TankAction::MoveForward: {
+        case ActionRequest::MoveForward: {
             Position newPos = board.wrapPosition(tank.getPosition().move(tank.getDirection(), 1));
             Tile& targetTile = board.getTile(newPos);
             // Don't move if wall or tank ahead — mines/shells handled in checkCollisions
@@ -175,7 +175,7 @@ void GameManager::handleTankAction(Tank& tank, TankAction& action) {
             break;
         }
 
-        case TankAction::MoveBackward: {
+        case ActionRequest::MoveBackward: {
             if (tank.isWaitingForBackward()) {
                 // Already waiting, ignore
                 success = false;
@@ -193,23 +193,23 @@ void GameManager::handleTankAction(Tank& tank, TankAction& action) {
             }
             break;
         }
-        case TankAction::RotateLeft8:
+        case ActionRequest::RotateLeft45:
             tank.rotateLeft8();
             break;
 
-        case TankAction::RotateRight8:
+        case ActionRequest::RotateRight45:
             tank.rotateRight8();
             break;
 
-        case TankAction::RotateLeft4:
+        case ActionRequest::RotateLeft90:
             tank.rotateLeft4();
             break;
 
-        case TankAction::RotateRight4:
+        case ActionRequest::RotateRight90:
             tank.rotateRight4();
             break;
 
-        case TankAction::None:
+        case ActionRequest::DoNothing:
             break;
         default:
             success = false;
@@ -366,7 +366,7 @@ void GameManager::checkCollisions() {
     }
 }
 
-void GameManager::recordAction(int playerId, int tankId, TankAction action, bool success) {
+void GameManager::recordAction(int playerId, int tankId, ActionRequest action, bool success) {
     std::string logEntry = "P" + std::to_string(playerId) + "-T" + std::to_string(tankId) +
                            ": " + std::string(to_string(action)) +
                            (success ? "" : " (BAD STEP)");
